@@ -690,6 +690,101 @@ window.__dspCheck = async function dspCheck() {
   const exportedPeak = peakOf(rendered);
   check("the render contains audio", exportedPeak > 0.01, exportedPeak.toFixed(4));
 
+  /* ---- the render must begin exactly at the loop start ---- */
+  const firstSoundMs = (buffer, threshold = 1e-4, fromMs = 0) => {
+    const start = Math.max(0, Math.floor((fromMs / 1000) * buffer.sampleRate));
+    for (let i = start; i < buffer.length; i++) {
+      for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+        if (Math.abs(buffer.getChannelData(channel)[i]) > threshold) return (i / buffer.sampleRate) * 1000;
+      }
+    }
+    return Infinity;
+  };
+
+  const leadIn = firstSoundMs(rendered);
+  check(
+    "the export starts at the very start of the loop",
+    leadIn < 10,
+    `${leadIn.toFixed(2)} ms before the first step`
+  );
+
+  /* swing must not push the downbeat late */
+  api.setSwing(1);
+  api.setSwingGrid(8);
+  const swungRender = await api.renderPatternToBuffer(1);
+  const swungLeadIn = firstSoundMs(swungRender);
+  check(
+    "swing does not delay the first step",
+    swungLeadIn < 10,
+    `${swungLeadIn.toFixed(2)} ms with full swing`
+  );
+  api.setSwing(0);
+
+  /* neither should an insert with a tail */
+  api.addEffect("delay", "synth");
+  api.state.racks.synth[0].params.mix = 0.6;
+  api.rebuildRack("synth");
+  const wetRender = await api.renderPatternToBuffer(1);
+  check(
+    "a delay insert does not push the start back",
+    firstSoundMs(wetRender) < 10,
+    `${firstSoundMs(wetRender).toFixed(2)} ms with a delay`
+  );
+  api.clearRack("synth");
+
+  /* and the timeline is aligned: step 8 lands where step 8 is */
+  exportSeq.synth[0][0] = false;
+  const eighthBar = await api.renderPatternToBuffer(1);
+  const eighthMs = firstSoundMs(eighthBar);
+  const expectedEighth = api.stepOnsetMs ? api.stepOnsetMs(8) : (8 * 60 * 1000) / (120 * 4);
+  check(
+    "a note on step 8 lands at step 8 of the loop",
+    Math.abs(eighthMs - expectedEighth) < 15,
+    `${eighthMs.toFixed(1)} ms vs ${expectedEighth.toFixed(1)} ms`
+  );
+  exportSeq.synth[0][0] = true;
+
+  /* a pattern that starts with a drum must also start on the downbeat */
+  exportSeq.synth[0].fill(false);
+  const kickLane = api.drumLanes()[0];
+  api.state.drums.kit = "analog";
+  exportSeq.drums[kickLane.id][0] = true;
+  const drumFirst = await api.renderPatternToBuffer(1);
+  const drumLead = firstSoundMs(drumFirst);
+  check(
+    "a drum on step 1 starts the file on the downbeat",
+    drumLead < 10,
+    `${drumLead.toFixed(2)} ms before the kick`
+  );
+
+  /* exporting while the transport runs must not shift the file either */
+  api.togglePlayback();
+  await new Promise((resolve) => setTimeout(resolve, 260)); // land mid-loop
+  const whilePlaying = await api.renderPatternToBuffer(1);
+  const playingLead = firstSoundMs(whilePlaying);
+  api.togglePlayback();
+  check(
+    "exporting mid-playback still starts at the loop start",
+    playingLead < 10,
+    `${playingLead.toFixed(2)} ms while the transport was running`
+  );
+
+  /* multi-bar exports restart the loop exactly on every bar line */
+  exportSeq.drums[kickLane.id][8] = false;
+  exportSeq.synth[0].fill(false);
+  exportSeq.drums[kickLane.id][0] = true;
+  const twoBars = await api.renderPatternToBuffer(2);
+  const barMs = api.loopDurationMs();
+  check("a multi-bar export opens on the downbeat", firstSoundMs(twoBars, 1e-3) < 10, `${firstSoundMs(twoBars, 1e-3).toFixed(2)} ms`);
+  const restartMs = firstSoundMs(twoBars, 1e-3, barMs * 0.5);
+  check(
+    "and restarts exactly on the second bar line",
+    Math.abs(restartMs - barMs) < 10,
+    `${restartMs.toFixed(1)} ms vs the ${barMs.toFixed(0)} ms bar line`
+  );
+  exportSeq.drums[kickLane.id][0] = false;
+  exportSeq.synth[0][0] = true;
+
   for (const moduleId of ["drums", "bass", "synth", "strings", "drop"]) api.setModuleMuted(moduleId, true);
   const silentRender = await api.renderPatternToBuffer(1);
   check("a fully stopped mix renders silence", peakOf(silentRender) < 1e-4, peakOf(silentRender).toExponential(2));
@@ -703,6 +798,11 @@ window.__dspCheck = async function dspCheck() {
     "the exported wav decodes back",
     decoded.numberOfChannels === 2 && Math.abs(decoded.duration - rendered.duration) < 0.01,
     `${decoded.duration.toFixed(3)}s, ${decoded.numberOfChannels}ch`
+  );
+  check(
+    "the file itself starts at the very start of the loop",
+    firstSoundMs(decoded) < 10,
+    `${firstSoundMs(decoded).toFixed(2)} ms into the file`
   );
   check(
     "the decoded wav carries the same audio",

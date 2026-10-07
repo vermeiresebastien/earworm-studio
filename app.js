@@ -3445,6 +3445,14 @@ function clearPatterns() {
 /* ---- offline render + wav encoding ---- */
 
 /**
+ * The render is always anchored to the very start of the loop: bar 0 step 0 is
+ * scheduled at exactly t = 0, whatever the transport is doing and whatever the
+ * tempo or swing is. Swing pushes the off-beats later, never step 0, so the
+ * exported file begins on the downbeat.
+ */
+const EXPORT_START_SECONDS = 0;
+
+/**
  * Render the pattern into an OfflineAudioContext by pointing the module-level
  * audio globals at a fresh graph for the duration of the render.
  */
@@ -3469,7 +3477,8 @@ async function renderPatternToBuffer(bars = 4) {
     getMaster(state.volume); // builds buses, racks and levels inside the offline context
     for (let bar = 0; bar < bars; bar++) {
       for (let step = 0; step < STEPS; step++) {
-        playStep(step, bar * barSeconds + stepOnsetMs(step) / 1000);
+        // step 0 of bar 0 lands on EXPORT_START_SECONDS exactly
+        playStep(step, EXPORT_START_SECONDS + bar * barSeconds + stepOnsetMs(step) / 1000);
       }
     }
     return await offline.startRendering();
@@ -4203,6 +4212,7 @@ window.earworm = {
   setDrumLanes,
   laneHints,
   playStep,
+  togglePlayback,
   playDrum,
   playBass,
   playSynth,
