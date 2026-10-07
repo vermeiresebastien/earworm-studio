@@ -3,6 +3,9 @@
 A 16-step sequencer that runs in the browser. No build step, no framework, no
 server — open `index.html` and play.
 
+**▶ [Play it live](https://vermeiresebastien.github.io/earworm-studio/)** — the
+deployed demo, served over HTTPS so the sample folder picker works too.
+
 ![Drum lanes with per-lane colours](preview-lanes.png)
 
 Five instruments (drums, bass, synth, strings, drop), a mixer and effect chain
@@ -72,13 +75,14 @@ per channel, FM synthesis, envelopes, sample import, and WAV export.
 
 ## Getting started
 
-Open `index.html` in a Chromium browser. That's it.
+**[Play it live](https://vermeiresebastien.github.io/earworm-studio/)** — nothing
+to install. To run it yourself instead, open `index.html` in a Chromium browser.
 
 Two optional tips:
 
-- Open the page from a local server (`python -m http.server`) if you want the
-  browser to remember your sample folder between visits — `file://` pages cannot
-  keep a directory handle.
+- Open the page from a local server (`python -m http.server`) or the live demo if
+  you want the browser to remember your sample folder between visits — `file://`
+  pages cannot keep a directory handle.
 - Firefox and Safari work, but the sample *folder* picker needs the File System
   Access API, which is Chromium-only. Importing individual files works everywhere.
 
@@ -122,7 +126,9 @@ node run-tests.mjs 9333 screenshot.html 1280x900 preview.png
 ```
 
 Current status: **393/393** jsdom checks, **295/295** UI checks, **48/48** audio
-measurements, plus a real key-press test for the space bar.
+measurements, plus a real key-press test for the space bar. The same browser suite
+also runs against the [deployed demo](https://vermeiresebastien.github.io/earworm-studio/test.html)
+and passes there too.
 
 ## How it works
 
