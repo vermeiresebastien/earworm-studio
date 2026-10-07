@@ -1,0 +1,10 @@
+# dependencies and tooling
+node_modules/
+
+# headless Chrome profiles the browser test runner creates
+.chrome-profile*/
+
+# editor / OS noise
+.DS_Store
+Thumbs.db
+*.log

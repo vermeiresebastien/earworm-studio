@@ -1,0 +1,1153 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #292929;
+  color: #fff;
+  font-family: Geist, "Segoe UI", sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* taps should act immediately, not wait to see if a double-tap zoom follows */
+button,
+select,
+input,
+.step,
+.slider {
+  touch-action: manipulation;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #292929;
+}
+
+.top,
+.bottom {
+  flex-shrink: 0;
+  padding: 25.6px;
+}
+
+.top {
+  padding-bottom: 0;
+}
+
+.bottom {
+  padding-top: 0;
+  /* Keep Play / Tempo / Swing reachable when the panels make the page scroll. */
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: #292929;
+}
+
+.top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.logo {
+  margin: 0;
+  font-family: Michroma, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logo span {
+  display: block;
+}
+
+.instruments {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.instrument {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 0.56px;
+  transition: all 0.2s ease;
+}
+
+.instrument.active {
+  border: none;
+  color: #292929;
+}
+
+.rule {
+  height: 1px;
+  margin-top: 25.6px;
+  background: #626262;
+}
+
+.bottom .rule {
+  margin-top: 0;
+  margin-bottom: 25.6px;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  align-items: safe center;
+  justify-content: center;
+  padding: 32px 25.6px;
+  overflow-x: auto;
+}
+
+.stage-inner {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grid-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.row-label {
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 8px;
+  color: #fff;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid rgba(240, 240, 240, 0.4);
+  background: transparent;
+  opacity: 0.4;
+  flex-shrink: 0;
+  transition: all 100ms;
+  padding: 0;
+}
+
+.step.on {
+  opacity: 1;
+  border: none;
+}
+
+.step.playhead {
+  border: 2px solid #fff;
+}
+
+/* --- drum sounds panel ------------------------------------------------ */
+
+.sounds {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #3b3b3b;
+  border-radius: 12px;
+  background: #2e2e2e;
+}
+
+.sounds[hidden] {
+  display: none;
+}
+
+.sounds.dragover {
+  border-color: #99ff71;
+}
+
+.sounds-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sounds-title {
+  margin: 0;
+  font-family: Michroma, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.sounds-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  transition: background-color 0.15s ease;
+}
+
+.chip-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chip-btn[hidden] {
+  display: none;
+}
+
+.sounds-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.voice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.voice label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.voice select {
+  width: 100%;
+}
+
+select {
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid #4a4a4a;
+  background: #3b3b3b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+select:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.sounds-status {
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.6;
+}
+
+/* --- melodic voice + effects rack ------------------------------------- */
+
+.transpose-label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.pitch-block {
+  flex: 1 1 240px;
+  gap: 8px;
+}
+
+.mix-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 170px;
+  min-width: 0;
+}
+
+.mix-strip.muted .slider,
+.mix-strip.muted .mix-name {
+  opacity: 0.4;
+}
+
+.mix-name {
+  font-size: 12px;
+}
+
+.mix-mute {
+  align-self: flex-start;
+}
+
+.pitch-block .tempo-value {
+  min-width: 62px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stepper .chip-btn {
+  height: 42px;
+  border-radius: 7.66px;
+}
+
+.octave-btn {
+  padding: 0 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.transpose-value {
+  min-width: 54px;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fx-value {
+  opacity: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+.fx-param-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.fx-param-head .fx-value {
+  opacity: 1;
+}
+
+.fx-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fx-body[hidden] {
+  display: none;
+}
+
+.add-buttons {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.text-input {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #4a4a4a;
+  background: #3b3b3b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  min-width: 150px;
+}
+
+.text-input:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.text-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.pattern-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 30px;
+  align-items: center;
+}
+
+.pattern-empty {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.pattern-chip {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid #4a4a4a;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #3b3b3b;
+}
+
+.pattern-load {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  padding: 0 10px;
+  height: 30px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pattern-load:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.pattern-remove {
+  border: none;
+  border-left: 1px solid #4a4a4a;
+  background: transparent;
+  color: #fff;
+  font-size: 11px;
+  width: 26px;
+}
+
+.pattern-remove:hover {
+  background: rgba(255, 90, 90, 0.35);
+}
+
+.export-row {
+  border-top: 1px solid #3b3b3b;
+  padding-top: 12px;
+}
+
+.channel-output {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid #3b3b3b;
+}
+
+.channel-output .slider {
+  width: 100%;
+}
+
+/* --- drum lane cards: colour, name, sound and pitch per drum --------------- */
+
+.lane-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #3b3b3b;
+  border-radius: 10px;
+  background: #2f2f2f;
+}
+
+.lane-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lane-color {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid #4a4a4a;
+  border-radius: 7px;
+  background: none;
+  cursor: pointer;
+}
+
+.lane-color::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.lane-color::-webkit-color-swatch {
+  border: none;
+  border-radius: 5px;
+}
+
+.lane-name {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-weight: 500;
+}
+
+.lane-remove {
+  flex: 0 0 auto;
+}
+
+.lane-remove:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.lane-voice-label {
+  font-size: 11px;
+  color: #b3b3b3;
+}
+
+.lane-pitch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #3b3b3b;
+}
+
+.lane-pitch-label {
+  font-size: 11px;
+  color: #b3b3b3;
+}
+
+.lane-pitch .tempo-value {
+  min-width: 52px;
+}
+
+.lane-pitch-value {
+  font-size: 16px;
+}
+
+.export-label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.collapse-btn {
+  opacity: 0.7;
+}
+
+.fx-empty {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.6;
+}
+
+.fx-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #454545;
+  border-radius: 10px;
+  background: #333;
+}
+
+.fx-card.bypassed {
+  opacity: 0.45;
+}
+
+.fx-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fx-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4a4a4a;
+  font-size: 11px;
+}
+
+.fx-name {
+  font-size: 13px;
+}
+
+.fx-hint {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.fx-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.fx-actions .chip-btn {
+  height: 28px;
+  padding: 0 10px;
+}
+
+.chip-btn[aria-pressed="true"] {
+  background: #fff;
+  border-color: #fff;
+  color: #292929;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.fx-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.fx-param {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
+.fx-param label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.fx-param .slider,
+.voice .slider {
+  width: 100%;
+}
+
+.fm-amount,
+.fm-decay {
+  flex: 1 1 180px;
+  justify-content: flex-end;
+}
+
+/* --- transport -------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.square-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  font-size: 14px;
+  letter-spacing: 0.56px;
+  transition: background-color 0.15s ease;
+}
+
+.square-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.square-btn.armed {
+  background: #ff9a00;
+  border-color: #ff9a00;
+  color: #292929;
+  font-weight: 500;
+}
+
+.history-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.history-btn {
+  width: 42px;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.history-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.slider {
+  position: relative;
+  width: 112px;
+  height: 24px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.transport .slider {
+  margin-left: 8px;
+}
+
+.slider:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.slider-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: #000;
+  transform: translateY(-50%);
+}
+
+.slider-fill {
+  height: 100%;
+  width: 70%;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 70%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #000;
+  transform: translate(-50%, -50%);
+}
+
+.mix {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.tempo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.tempo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tempo-btn,
+.tempo-value {
+  height: 42px;
+  background: #3b3b3b;
+  border: none;
+  border-radius: 7.66px;
+  color: #fff;
+}
+
+.tempo-btn {
+  padding: 0 12px;
+}
+
+.tempo-value {
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  font-size: 20px;
+}
+
+.tempo-label {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.swing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.swing-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+}
+
+.swing-grid {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.grid-btn {
+  height: 42px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 7.66px;
+  background: #3b3b3b;
+  color: #fff;
+  font-size: 12px;
+}
+
+.grid-btn[aria-pressed="true"] {
+  background: #fff;
+  color: #292929;
+}
+
+/* --- tablets and small laptops ---------------------------------------- */
+@media (max-width: 1100px) {
+  .step {
+    width: 36px;
+    height: 36px;
+  }
+
+  .row-label {
+    width: 56px;
+    font-size: 12px;
+  }
+}
+
+/* --- large phones, small tablets and landscape phones ----------------- */
+@media (max-width: 860px) {
+  .top,
+  .bottom {
+    padding: 16px;
+  }
+
+  .top {
+    padding-bottom: 0;
+  }
+
+  .bottom {
+    padding-top: 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .stage {
+    padding: 20px 16px;
+  }
+
+  .stage-inner {
+    gap: 16px;
+  }
+
+  .grid-wrap {
+    gap: 12px;
+  }
+
+  /* the 16 steps share the width instead of overflowing the screen */
+  .row {
+    gap: 10px;
+  }
+
+  .row-label {
+    width: 46px;
+    font-size: 11px;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+    gap: 5px;
+    width: 100%;
+  }
+
+  .step {
+    width: auto;
+    height: 34px;
+    border-radius: 6px;
+  }
+
+  .instrument,
+  .square-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 11px;
+  }
+
+  .slider {
+    width: 96px;
+  }
+
+  .sounds {
+    padding: 14px;
+  }
+}
+
+/* --- phones (portrait) ------------------------------------------------ */
+@media (max-width: 620px) {
+  .top,
+  .bottom {
+    padding: 12px;
+  }
+
+  .bottom {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .top-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .instruments {
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .instrument {
+    width: 46px;
+    height: 46px;
+    border-radius: 7px;
+    font-size: 10px;
+  }
+
+  .rule {
+    margin-top: 12px;
+  }
+
+  .bottom .rule {
+    margin-bottom: 12px;
+  }
+
+  .stage {
+    padding: 14px 12px;
+  }
+
+  .stage-inner {
+    gap: 12px;
+  }
+
+  .sounds {
+    padding: 12px;
+    gap: 10px;
+    border-radius: 10px;
+  }
+
+  .sounds-title {
+    font-size: 11px;
+  }
+
+  .row {
+    gap: 8px;
+  }
+
+  .row-label {
+    width: 40px;
+    padding-right: 2px;
+    font-size: 10px;
+  }
+
+  .steps {
+    gap: 3px;
+  }
+
+  .step {
+    height: 32px;
+    border-radius: 5px;
+  }
+
+  .voice,
+  .fx-param,
+  .mix-strip {
+    flex: 1 1 140px;
+  }
+
+  .stepper {
+    gap: 5px;
+  }
+
+  .tempo-btn {
+    padding: 0 8px;
+  }
+
+  .tempo-value {
+    min-width: 46px;
+    font-size: 16px;
+  }
+
+  .grid-btn {
+    height: 34px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+
+  .octave-btn {
+    padding: 0 6px;
+  }
+
+  .text-input {
+    min-width: 0;
+    flex: 1 1 110px;
+  }
+
+  .chip-btn {
+    height: 30px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
+
+  .fx-actions .chip-btn {
+    height: 26px;
+  }
+
+  .controls {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .transport {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .square-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 11px;
+  }
+
+  .history-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .transport .slider {
+    margin-left: 0;
+  }
+
+  .slider {
+    width: 84px;
+  }
+
+  .mix {
+    gap: 12px;
+  }
+
+  .tempo,
+  .swing {
+    height: 54px;
+  }
+
+  .swing-row {
+    height: 34px;
+  }
+
+  .pitch-block {
+    flex: 1 1 100%;
+  }
+}
+
+/* --- small phones ----------------------------------------------------- */
+@media (max-width: 380px) {
+  .row-label {
+    width: 32px;
+  }
+
+  .steps {
+    gap: 2px;
+  }
+
+  .instrument {
+    width: 42px;
+    height: 42px;
+  }
+
+  .square-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .slider {
+    width: 68px;
+  }
+}

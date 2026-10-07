@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Earworm Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="top">
+        <div class="top-row">
+          <h1 class="logo">
+            <span>earworm</span>
+            <span>studio</span>
+          </h1>
+          <nav class="instruments" id="instruments" aria-label="Instruments"></nav>
+        </div>
+        <div class="rule" aria-hidden="true"></div>
+      </header>
+
+      <main class="stage">
+        <div class="stage-inner">
+          <div class="grid-wrap" id="grid"></div>
+
+          <section class="sounds" id="patterns" aria-label="Patterns and export">
+            <div class="sounds-head">
+              <h2 class="sounds-title">Patterns</h2>
+              <div class="sounds-actions">
+                <input
+                  type="text"
+                  id="pattern-name"
+                  class="text-input"
+                  maxlength="40"
+                  placeholder="Pattern name"
+                  aria-label="Name for the pattern you are saving"
+                />
+                <button class="chip-btn" id="pattern-save" title="Save the current 16 steps">Save pattern</button>
+              </div>
+            </div>
+            <div class="pattern-list" id="pattern-list"></div>
+            <div class="sounds-head export-row">
+              <div class="sounds-actions">
+                <label class="export-label" for="export-bars">Render</label>
+                <select id="export-bars" aria-label="How many bars to render">
+                  <option value="1">1 bar</option>
+                  <option value="2">2 bars</option>
+                  <option value="4" selected>4 bars</option>
+                  <option value="8">8 bars</option>
+                </select>
+                <button class="chip-btn" id="export-wav" title="Render the pattern to a .wav file">Export .wav</button>
+              </div>
+            </div>
+            <div class="sounds-status" id="patterns-status"></div>
+          </section>
+
+          <section class="sounds" id="mix" aria-label="Mixer">
+            <div class="sounds-head">
+              <h2 class="sounds-title">Mix</h2>
+              <div class="sounds-actions">
+                <button class="chip-btn" id="mix-reset" title="All faders back to 100%">Reset levels</button>
+              </div>
+            </div>
+            <div class="sounds-grid" id="mix-grid"></div>
+            <div class="sounds-status" id="mix-status"></div>
+          </section>
+
+          <section class="sounds" id="sounds" aria-label="Drum sounds" hidden>
+            <div class="sounds-head">
+              <h2 class="sounds-title">Drum sounds</h2>
+              <div class="sounds-actions">
+                <button class="chip-btn" id="folder-pick" title="Pick a folder of drum samples to choose from">Sample folder…</button>
+                <button class="chip-btn" id="folder-reconnect" hidden>Reconnect</button>
+                <button class="chip-btn" id="folder-forget" hidden>Forget folder</button>
+                <button class="chip-btn" id="files-import" title="Import individual sample files">Import…</button>
+                <button class="chip-btn" id="samples-clear" title="Remove the samples you imported" hidden>Clear imported</button>
+                <button class="chip-btn" id="lane-add" title="Add another drum row to the grid">+ Add drum</button>
+                <button class="chip-btn" id="samples-automap" title="Assign samples to lanes using their file names">Auto-map</button>
+              </div>
+            </div>
+            <div class="sounds-grid" id="sounds-grid"></div>
+            <div class="sounds-status" id="sounds-status"></div>
+            <input type="file" id="folder-input" webkitdirectory directory multiple hidden />
+            <input
+              type="file"
+              id="files-input"
+              accept="audio/*,.wav,.wave,.mp3,.ogg,.oga,.opus,.m4a,.aac,.flac,.aif,.aiff,.webm"
+              multiple
+              hidden
+            />
+          </section>
+
+          <section class="sounds" id="melodic" aria-label="Melodic voice" hidden>
+            <div class="sounds-head">
+              <h2 class="sounds-title" id="melodic-title">Synth voice</h2>
+            </div>
+            <div class="sounds-grid" id="melodic-grid"></div>
+            <div class="sounds-status" id="melodic-status"></div>
+          </section>
+
+          <section class="sounds" id="pitch-panel" aria-label="Pitch">
+            <div class="sounds-head">
+              <h2 class="sounds-title" id="pitch-title">Pitch</h2>
+              <div class="sounds-actions">
+                <button class="chip-btn" id="pitch-reset" title="Back to the written pitch">Reset this</button>
+                <button class="chip-btn" id="pitch-reset-all" title="Clear every pitch offset">Reset all</button>
+              </div>
+            </div>
+            <div class="sounds-grid">
+              <div class="voice pitch-block">
+                <div class="fx-param-head">
+                  <span>This instrument</span>
+                  <span class="fx-value" id="pitch-total">total 0 semitones</span>
+                </div>
+                <div class="stepper">
+                  <button class="tempo-btn octave-btn" id="pitch-down-12" title="Down an octave (12 semitones)" aria-label="Pitch this instrument down an octave">-12</button>
+                  <button class="tempo-btn" id="pitch-down" title="One semitone down (hold Shift for an octave)" aria-label="Pitch this instrument down a semitone">-</button>
+                  <div class="tempo-value" id="pitch-readout">0</div>
+                  <button class="tempo-btn" id="pitch-up" title="One semitone up (hold Shift for an octave)" aria-label="Pitch this instrument up a semitone">+</button>
+                  <button class="tempo-btn octave-btn" id="pitch-up-12" title="Up an octave (12 semitones)" aria-label="Pitch this instrument up an octave">+12</button>
+                </div>
+              </div>
+              <div class="voice pitch-block">
+                <div class="fx-param-head">
+                  <span>All melodic instruments</span>
+                  <span class="fx-value" id="pitch-global-note">bass · synth · strings</span>
+                </div>
+                <div class="stepper">
+                  <button class="tempo-btn octave-btn" id="transpose-down-12" title="Down an octave (12 semitones)" aria-label="Transpose down an octave">-12</button>
+                  <button class="tempo-btn" id="transpose-down" title="One semitone down (hold Shift for an octave)" aria-label="Transpose down a semitone">-</button>
+                  <div class="tempo-value" id="transpose-value">0</div>
+                  <button class="tempo-btn" id="transpose-up" title="One semitone up (hold Shift for an octave)" aria-label="Transpose up a semitone">+</button>
+                  <button class="tempo-btn octave-btn" id="transpose-up-12" title="Up an octave (12 semitones)" aria-label="Transpose up an octave">+12</button>
+                  <button class="chip-btn" id="transpose-reset" title="Back to the original pitch">Reset</button>
+                </div>
+              </div>
+            </div>
+            <div class="sounds-status" id="pitch-status"></div>
+          </section>
+
+          <section class="sounds" id="envelope" aria-label="Amplitude envelope">
+            <div class="sounds-head">
+              <h2 class="sounds-title" id="envelope-title">Envelope</h2>
+              <div class="sounds-actions">
+                <button class="chip-btn" id="envelope-reset" title="Back to the default envelope for this instrument">
+                  Reset
+                </button>
+              </div>
+            </div>
+            <div class="sounds-grid" id="envelope-grid"></div>
+            <div class="sounds-status" id="envelope-status"></div>
+          </section>
+
+          <section class="sounds" id="inserts" aria-label="Insert effects">
+            <div class="sounds-head">
+              <h2 class="sounds-title" id="inserts-title">Inserts</h2>
+              <div class="sounds-actions">
+                <span class="add-buttons" id="insert-add"></span>
+                <button class="chip-btn" id="insert-clear" title="Empty this instrument's chain">Clear</button>
+                <button class="chip-btn collapse-btn" id="inserts-collapse" aria-expanded="true" title="Collapse this panel">
+                  Hide
+                </button>
+              </div>
+            </div>
+            <div class="fx-body" id="inserts-body"></div>
+            <div class="channel-output">
+              <div class="fx-param-head">
+                <span id="insert-output-label">Output — after the inserts</span>
+                <span class="fx-value" id="insert-output-value">100%</span>
+              </div>
+              <div
+                class="slider"
+                id="insert-output-slider"
+                role="slider"
+                tabindex="0"
+                aria-label="Channel output level, after the inserts"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="67"
+              >
+                <div class="slider-track">
+                  <div class="slider-fill" id="insert-output-slider-fill"></div>
+                </div>
+                <div class="slider-thumb" id="insert-output-slider-thumb"></div>
+              </div>
+            </div>
+            <div class="sounds-status" id="inserts-status"></div>
+          </section>
+
+          <section class="sounds" id="fm2" aria-label="FM 2">
+            <div class="sounds-head">
+              <h2 class="sounds-title" id="fm2-title">FM 2</h2>
+              <div class="sounds-actions">
+                <button class="chip-btn" id="fm2-reset" title="Back to the default FM 2 setting for this instrument">Reset</button>
+              </div>
+            </div>
+            <div class="sounds-grid" id="fm2-grid"></div>
+            <div class="sounds-status" id="fm2-status"></div>
+          </section>
+
+          <section class="sounds" id="effects" aria-label="Master effects chain">
+            <div class="sounds-head">
+              <h2 class="sounds-title">Effects · master</h2>
+              <div class="sounds-actions">
+                <span class="add-buttons" id="fx-add"></span>
+                <button class="chip-btn" id="fx-clear" title="Empty the master rack">Clear</button>
+                <button class="chip-btn collapse-btn" id="effects-collapse" aria-expanded="true" title="Collapse this panel">
+                  Hide
+                </button>
+              </div>
+            </div>
+            <div class="fx-body" id="effects-body"></div>
+            <div class="sounds-status" id="effects-status"></div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="bottom">
+        <div class="rule" aria-hidden="true"></div>
+        <div class="controls">
+          <div class="transport">
+            <button class="square-btn" id="play" aria-label="Play">Play</button>
+            <button class="square-btn" id="clear" aria-label="Clear">Clear</button>
+            <button class="square-btn" id="demo" aria-label="Demo">Demo</button>
+            <button
+              class="square-btn"
+              id="reset-all"
+              aria-label="Reset everything"
+              aria-pressed="false"
+              title="Reset everything: pattern, sound, mixer, effects and samples"
+            >
+              Reset
+            </button>
+            <div class="history-buttons" role="group" aria-label="Undo and redo">
+              <button class="grid-btn history-btn" id="undo" title="Nothing to undo" aria-label="Undo">↶</button>
+              <button class="grid-btn history-btn" id="redo" title="Nothing to redo" aria-label="Redo">↷</button>
+            </div>
+            <div
+              class="slider"
+              id="volume"
+              role="slider"
+              tabindex="0"
+              aria-label="Volume Control"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="70"
+              title="Adjust volume"
+            >
+              <div class="slider-track">
+                <div class="slider-fill" id="volume-fill"></div>
+              </div>
+              <div class="slider-thumb" id="volume-thumb"></div>
+            </div>
+          </div>
+          <div class="mix">
+            <div class="tempo">
+              <div class="tempo-row">
+                <button class="tempo-btn" id="tempo-down" aria-label="Decrease tempo">-</button>
+                <div class="tempo-value" id="tempo-value">120</div>
+                <button class="tempo-btn" id="tempo-up" aria-label="Increase tempo">+</button>
+              </div>
+              <div class="tempo-label">Tempo</div>
+            </div>
+            <div class="swing">
+              <div class="swing-row">
+                <div
+                  class="slider"
+                  id="swing"
+                  role="slider"
+                  tabindex="0"
+                  aria-label="Swing amount"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  title="Adjust swing"
+                >
+                  <div class="slider-track">
+                    <div class="slider-fill" id="swing-fill"></div>
+                  </div>
+                  <div class="slider-thumb" id="swing-thumb"></div>
+                </div>
+                <div class="swing-grid" role="group" aria-label="Swing grid">
+                  <button class="grid-btn" id="swing-grid-8" aria-pressed="true" title="Swing the 8th notes">1/8</button>
+                  <button class="grid-btn" id="swing-grid-16" aria-pressed="false" title="Swing the 16th notes">1/16</button>
+                </div>
+              </div>
+              <div class="tempo-label">Swing <span id="swing-value">0%</span></div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+    <script src="dsp-check.js"></script>
+    <script src="test-harness.js"></script>
+    <script src="test-auto.js"></script>
+  </body>
+</html>
